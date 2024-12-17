@@ -78,15 +78,15 @@ def get_stock_data(conn):
         return None
 
 # def create_price_chart(ticker_data, symbol, breakout_type):
-#     # Take exactly 20 rows (21 trading days total including current day)
-#     display_data = ticker_data.head(20).sort_values('DATE', ascending=True)
+#     # Take exactly 21 trading days and sort by date
+#     display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
     
 #     # Get base64 encoded logo
 #     logo_base64 = get_image_as_base64()
     
 #     fig = go.Figure()
 #     fig.add_trace(go.Scatter(
-#         x=display_data['DATE'],
+#         x=list(range(len(display_data))),  # Use indices instead of dates for x-axis
 #         y=display_data['ADJCLOSE'],
 #         mode='lines',
 #         name=symbol,
@@ -133,8 +133,8 @@ def get_stock_data(conn):
 #             showgrid=True,
 #             gridcolor='#E5E5E5',
 #             tickmode='array',
-#             ticktext=display_data['DATE'].dt.strftime('%b %d'),
-#             tickvals=display_data['DATE'],
+#             ticktext=display_data['DATE'].dt.strftime('%b %d'),  # Show date labels
+#             tickvals=list(range(len(display_data))),  # Position ticks at each point
 #             tickangle=-45,
 #             showline=True,
 #             linewidth=1,
@@ -153,15 +153,20 @@ def get_stock_data(conn):
 #     return fig
 
 def create_price_chart(ticker_data, symbol, breakout_type):
-    # Take exactly 21 trading days and sort by date
-    display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
+    # Take 63 trading days and sort by date
+    display_data = ticker_data.head(63).sort_values('DATE', ascending=True)
+    
+    # Get the last 21 days for breakout signals
+    last_month_data = display_data.tail(21)
     
     # Get base64 encoded logo
     logo_base64 = get_image_as_base64()
     
     fig = go.Figure()
+    
+    # Main price line
     fig.add_trace(go.Scatter(
-        x=list(range(len(display_data))),  # Use indices instead of dates for x-axis
+        x=list(range(len(display_data))),
         y=display_data['ADJCLOSE'],
         mode='lines',
         name=symbol,
@@ -171,6 +176,54 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         ),
         showlegend=False
     ))
+
+    # Add vertical line at the start of the last 21 trading days
+    fig.add_vline(
+        x=len(display_data) - 21,  # Position at start of last 21 days
+        line_dash="dash",
+        line_color="gray",
+        opacity=0.5,
+        annotation_text="Past Month",
+        annotation_position="top"
+    )
+
+    # Add breakout annotations for the last 21 days
+    if breakout_type == 'high':
+        breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_HIGH']].index
+    else:
+        breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_LOW']].index
+    
+    # Add annotations for breakout signals
+    for idx in breakout_days:
+        day_number = display_data.index.get_loc(idx)  # Get position in display data
+        price = display_data.loc[idx, 'ADJCLOSE']
+        
+        # Add marker point
+        fig.add_trace(go.Scatter(
+            x=[day_number],
+            y=[price],
+            mode='markers',
+            marker=dict(
+                size=10,
+                color='red' if breakout_type == 'low' else 'green',
+                symbol='triangle-down' if breakout_type == 'low' else 'triangle-up'
+            ),
+            showlegend=False
+        ))
+        
+        # Add annotation
+        fig.add_annotation(
+            x=day_number,
+            y=price,
+            text="Breakout",
+            yshift=15 if breakout_type == 'high' else -15,
+            showarrow=True,
+            arrowhead=2,
+            arrowsize=1,
+            arrowcolor='gray',
+            font=dict(size=10),
+            align='center'
+        )
 
     # Add logo as background image if available
     if logo_base64:
@@ -208,8 +261,8 @@ def create_price_chart(ticker_data, symbol, breakout_type):
             showgrid=True,
             gridcolor='#E5E5E5',
             tickmode='array',
-            ticktext=display_data['DATE'].dt.strftime('%b %d'),  # Show date labels
-            tickvals=list(range(len(display_data))),  # Position ticks at each point
+            ticktext=display_data['DATE'].dt.strftime('%b %d'),
+            tickvals=list(range(len(display_data))),
             tickangle=-45,
             showline=True,
             linewidth=1,
