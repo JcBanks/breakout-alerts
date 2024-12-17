@@ -45,7 +45,7 @@ def get_stock_data(conn):
            d.DESCRIPTION,
            ADJHIGH = MAX(ADJHIGH) over (
                partition by rsi.ticker
-               order by date rows between 19 preceding and current row
+               order by date rows between 20 preceding and current row
            ) as is_one_month_high,
            ADJHIGH = MAX(ADJHIGH) over (
                partition by rsi.ticker
@@ -53,7 +53,7 @@ def get_stock_data(conn):
            ) as is_one_year_high,
            ADJLOW = MIN(ADJLOW) over (
                partition by rsi.ticker
-               order by date rows between 19 preceding and current row
+               order by date rows between 20 preceding and current row
            ) as is_one_month_low,
            ADJLOW = MIN(ADJLOW) over (
                partition by rsi.ticker
