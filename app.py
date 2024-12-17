@@ -130,7 +130,15 @@ def create_price_chart(ticker_data, symbol, breakout_type):
     # Calculate tick positions for approximately monthly intervals
     tick_positions = list(range(0, len(display_data), 21))  # Show one tick per month
     tick_dates = [display_data.iloc[i]['DATE'] for i in tick_positions if i < len(display_data)]
-    tick_texts = [d.strftime('%b %Y') for d in tick_dates]  # Show month and year
+    tick_texts = [d.strftime('%b %Y') for d in tick_dates]
+
+    # Calculate y-axis range
+    y_min = display_data['ADJCLOSE'].min()
+    y_max = display_data['ADJCLOSE'].max()
+    y_range = y_max - y_min
+    # Add 5% padding
+    y_min -= y_range * 0.05
+    y_max += y_range * 0.05
 
     fig.update_layout(
         title={
@@ -151,7 +159,7 @@ def create_price_chart(ticker_data, symbol, breakout_type):
             gridcolor='#E5E5E5',
             gridwidth=0.5,
             griddash='dot',
-            dtick=21,  # Show grid lines monthly
+            dtick=21,
             tickmode='array',
             ticktext=tick_texts,
             tickvals=tick_positions,
@@ -166,7 +174,8 @@ def create_price_chart(ticker_data, symbol, breakout_type):
             gridcolor='#E5E5E5',
             gridwidth=0.5,
             griddash='dot',
-            dtick='auto',  # Auto-scale grid lines
+            nticks=8,  # Limit number of ticks
+            range=[y_min, y_max],  # Set range with padding
             showline=True,
             linewidth=1,
             linecolor='#CCCCCC',
@@ -176,7 +185,6 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         )
     )
     return fig
-
 def generate_analysis(ticker_data, symbol, breakout_type):
     current_row = ticker_data.iloc[0]
     signal_count = 0
