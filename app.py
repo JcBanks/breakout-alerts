@@ -77,16 +77,91 @@ def get_stock_data(conn):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
+# def create_price_chart(ticker_data, symbol, breakout_type):
+#     # Take exactly 20 rows (21 trading days total including current day)
+#     display_data = ticker_data.head(20).sort_values('DATE', ascending=True)
+    
+#     # Get base64 encoded logo
+#     logo_base64 = get_image_as_base64()
+    
+#     fig = go.Figure()
+#     fig.add_trace(go.Scatter(
+#         x=display_data['DATE'],
+#         y=display_data['ADJCLOSE'],
+#         mode='lines',
+#         name=symbol,
+#         line=dict(
+#             color='royalblue',
+#             width=2
+#         ),
+#         showlegend=False
+#     ))
+
+#     # Add logo as background image if available
+#     if logo_base64:
+#         fig.add_layout_image(
+#             dict(
+#                 source=f"data:image/png;base64,{logo_base64}",
+#                 xref="paper",
+#                 yref="paper",
+#                 x=0.5,
+#                 y=0.5,
+#                 sizex=0.6,
+#                 sizey=0.6,
+#                 xanchor="center",
+#                 yanchor="middle",
+#                 opacity=0.1,
+#                 layer="below"
+#             )
+#         )
+
+#     fig.update_layout(
+#         title={
+#             'text': f"{symbol} - {'Upward' if breakout_type == 'high' else 'Downward'} Breakout",
+#             'y':0.9,
+#             'x':0.5,
+#             'xanchor': 'center',
+#             'yanchor': 'top',
+#             'font': dict(size=16)
+#         },
+#         paper_bgcolor='white',
+#         plot_bgcolor='white',
+#         width=1250,
+#         height=400,
+#         margin=dict(l=40, r=40, t=60, b=40),
+#         xaxis=dict(
+#             showgrid=True,
+#             gridcolor='#E5E5E5',
+#             tickmode='array',
+#             ticktext=display_data['DATE'].dt.strftime('%b %d'),
+#             tickvals=display_data['DATE'],
+#             tickangle=-45,
+#             showline=True,
+#             linewidth=1,
+#             linecolor='#CCCCCC'
+#         ),
+#         yaxis=dict(
+#             showgrid=True,
+#             gridcolor='#E5E5E5',
+#             showline=True,
+#             linewidth=1,
+#             linecolor='#CCCCCC',
+#             tickprefix='$',
+#             tickformat='.2f'
+#         )
+#     )
+#     return fig
+
 def create_price_chart(ticker_data, symbol, breakout_type):
-    # Take exactly 20 rows (21 trading days total including current day)
-    display_data = ticker_data.head(20).sort_values('DATE', ascending=True)
+    # Take exactly 21 trading days and sort by date
+    display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
     
     # Get base64 encoded logo
     logo_base64 = get_image_as_base64()
     
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=display_data['DATE'],
+        x=list(range(len(display_data))),  # Use indices instead of dates for x-axis
         y=display_data['ADJCLOSE'],
         mode='lines',
         name=symbol,
@@ -133,8 +208,8 @@ def create_price_chart(ticker_data, symbol, breakout_type):
             showgrid=True,
             gridcolor='#E5E5E5',
             tickmode='array',
-            ticktext=display_data['DATE'].dt.strftime('%b %d'),
-            tickvals=display_data['DATE'],
+            ticktext=display_data['DATE'].dt.strftime('%b %d'),  # Show date labels
+            tickvals=list(range(len(display_data))),  # Position ticks at each point
             tickangle=-45,
             showline=True,
             linewidth=1,
