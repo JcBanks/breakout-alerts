@@ -77,96 +77,16 @@ def get_stock_data(conn):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
-# def create_price_chart(ticker_data, symbol, breakout_type):
-#     # Take exactly 21 trading days and sort by date
-#     display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
-    
-#     # Get base64 encoded logo
-#     logo_base64 = get_image_as_base64()
-    
-#     fig = go.Figure()
-#     fig.add_trace(go.Scatter(
-#         x=list(range(len(display_data))),  # Use indices instead of dates for x-axis
-#         y=display_data['ADJCLOSE'],
-#         mode='lines',
-#         name=symbol,
-#         line=dict(
-#             color='royalblue',
-#             width=2
-#         ),
-#         showlegend=False
-#     ))
-
-#     # Add logo as background image if available
-#     if logo_base64:
-#         fig.add_layout_image(
-#             dict(
-#                 source=f"data:image/png;base64,{logo_base64}",
-#                 xref="paper",
-#                 yref="paper",
-#                 x=0.5,
-#                 y=0.5,
-#                 sizex=0.6,
-#                 sizey=0.6,
-#                 xanchor="center",
-#                 yanchor="middle",
-#                 opacity=0.1,
-#                 layer="below"
-#             )
-#         )
-
-#     fig.update_layout(
-#         title={
-#             'text': f"{symbol} - {'Upward' if breakout_type == 'high' else 'Downward'} Breakout",
-#             'y':0.9,
-#             'x':0.5,
-#             'xanchor': 'center',
-#             'yanchor': 'top',
-#             'font': dict(size=16)
-#         },
-#         paper_bgcolor='white',
-#         plot_bgcolor='white',
-#         width=1250,
-#         height=400,
-#         margin=dict(l=40, r=40, t=60, b=40),
-#         xaxis=dict(
-#             showgrid=True,
-#             gridcolor='#E5E5E5',
-#             tickmode='array',
-#             ticktext=display_data['DATE'].dt.strftime('%b %d'),  # Show date labels
-#             tickvals=list(range(len(display_data))),  # Position ticks at each point
-#             tickangle=-45,
-#             showline=True,
-#             linewidth=1,
-#             linecolor='#CCCCCC'
-#         ),
-#         yaxis=dict(
-#             showgrid=True,
-#             gridcolor='#E5E5E5',
-#             showline=True,
-#             linewidth=1,
-#             linecolor='#CCCCCC',
-#             tickprefix='$',
-#             tickformat='.2f'
-#         )
-#     )
-#     return fig
-
 def create_price_chart(ticker_data, symbol, breakout_type):
-    # Take 63 trading days and sort by date
-    display_data = ticker_data.head(63).sort_values('DATE', ascending=True)
-    
-    # Get the last 21 days for breakout signals
-    last_month_data = display_data.tail(21)
+    # Take exactly 21 trading days and sort by date
+    display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
     
     # Get base64 encoded logo
     logo_base64 = get_image_as_base64()
     
     fig = go.Figure()
-    
-    # Main price line
     fig.add_trace(go.Scatter(
-        x=list(range(len(display_data))),
+        x=list(range(len(display_data))),  # Use indices instead of dates for x-axis
         y=display_data['ADJCLOSE'],
         mode='lines',
         name=symbol,
@@ -176,54 +96,6 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         ),
         showlegend=False
     ))
-
-    # Add vertical line at the start of the last 21 trading days
-    fig.add_vline(
-        x=len(display_data) - 21,  # Position at start of last 21 days
-        line_dash="dash",
-        line_color="gray",
-        opacity=0.5,
-        annotation_text="Past Month",
-        annotation_position="top"
-    )
-
-    # Add breakout annotations for the last 21 days
-    if breakout_type == 'high':
-        breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_HIGH']].index
-    else:
-        breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_LOW']].index
-    
-    # Add annotations for breakout signals
-    for idx in breakout_days:
-        day_number = display_data.index.get_loc(idx)  # Get position in display data
-        price = display_data.loc[idx, 'ADJCLOSE']
-        
-        # Add marker point
-        fig.add_trace(go.Scatter(
-            x=[day_number],
-            y=[price],
-            mode='markers',
-            marker=dict(
-                size=10,
-                color='red' if breakout_type == 'low' else 'green',
-                symbol='triangle-down' if breakout_type == 'low' else 'triangle-up'
-            ),
-            showlegend=False
-        ))
-        
-        # Add annotation
-        fig.add_annotation(
-            x=day_number,
-            y=price,
-            text="Breakout",
-            yshift=15 if breakout_type == 'high' else -15,
-            showarrow=True,
-            arrowhead=2,
-            arrowsize=1,
-            arrowcolor='gray',
-            font=dict(size=10),
-            align='center'
-        )
 
     # Add logo as background image if available
     if logo_base64:
@@ -261,8 +133,8 @@ def create_price_chart(ticker_data, symbol, breakout_type):
             showgrid=True,
             gridcolor='#E5E5E5',
             tickmode='array',
-            ticktext=display_data['DATE'].dt.strftime('%b %d'),
-            tickvals=list(range(len(display_data))),
+            ticktext=display_data['DATE'].dt.strftime('%b %d'),  # Show date labels
+            tickvals=list(range(len(display_data))),  # Position ticks at each point
             tickangle=-45,
             showline=True,
             linewidth=1,
@@ -279,6 +151,134 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         )
     )
     return fig
+
+# def create_price_chart(ticker_data, symbol, breakout_type):
+#     # Take 63 trading days and sort by date
+#     display_data = ticker_data.head(63).sort_values('DATE', ascending=True)
+    
+#     # Get the last 21 days for breakout signals
+#     last_month_data = display_data.tail(21)
+    
+#     # Get base64 encoded logo
+#     logo_base64 = get_image_as_base64()
+    
+#     fig = go.Figure()
+    
+#     # Main price line
+#     fig.add_trace(go.Scatter(
+#         x=list(range(len(display_data))),
+#         y=display_data['ADJCLOSE'],
+#         mode='lines',
+#         name=symbol,
+#         line=dict(
+#             color='royalblue',
+#             width=2
+#         ),
+#         showlegend=False
+#     ))
+
+#     # Add vertical line at the start of the last 21 trading days
+#     fig.add_vline(
+#         x=len(display_data) - 21,  # Position at start of last 21 days
+#         line_dash="dash",
+#         line_color="gray",
+#         opacity=0.5,
+#         annotation_text="Past Month",
+#         annotation_position="top"
+#     )
+
+#     # Add breakout annotations for the last 21 days
+#     if breakout_type == 'high':
+#         breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_HIGH']].index
+#     else:
+#         breakout_days = last_month_data[last_month_data['IS_ONE_MONTH_LOW']].index
+    
+#     # Add annotations for breakout signals
+#     for idx in breakout_days:
+#         day_number = display_data.index.get_loc(idx)  # Get position in display data
+#         price = display_data.loc[idx, 'ADJCLOSE']
+        
+#         # Add marker point
+#         fig.add_trace(go.Scatter(
+#             x=[day_number],
+#             y=[price],
+#             mode='markers',
+#             marker=dict(
+#                 size=10,
+#                 color='red' if breakout_type == 'low' else 'green',
+#                 symbol='triangle-down' if breakout_type == 'low' else 'triangle-up'
+#             ),
+#             showlegend=False
+#         ))
+        
+#         # Add annotation
+#         fig.add_annotation(
+#             x=day_number,
+#             y=price,
+#             text="Breakout",
+#             yshift=15 if breakout_type == 'high' else -15,
+#             showarrow=True,
+#             arrowhead=2,
+#             arrowsize=1,
+#             arrowcolor='gray',
+#             font=dict(size=10),
+#             align='center'
+#         )
+
+#     # Add logo as background image if available
+#     if logo_base64:
+#         fig.add_layout_image(
+#             dict(
+#                 source=f"data:image/png;base64,{logo_base64}",
+#                 xref="paper",
+#                 yref="paper",
+#                 x=0.5,
+#                 y=0.5,
+#                 sizex=0.6,
+#                 sizey=0.6,
+#                 xanchor="center",
+#                 yanchor="middle",
+#                 opacity=0.1,
+#                 layer="below"
+#             )
+#         )
+
+#     fig.update_layout(
+#         title={
+#             'text': f"{symbol} - {'Upward' if breakout_type == 'high' else 'Downward'} Breakout",
+#             'y':0.9,
+#             'x':0.5,
+#             'xanchor': 'center',
+#             'yanchor': 'top',
+#             'font': dict(size=16)
+#         },
+#         paper_bgcolor='white',
+#         plot_bgcolor='white',
+#         width=1250,
+#         height=400,
+#         margin=dict(l=40, r=40, t=60, b=40),
+#         xaxis=dict(
+#             showgrid=True,
+#             gridcolor='#E5E5E5',
+#             tickmode='array',
+#             ticktext=display_data['DATE'].dt.strftime('%b %d'),
+#             tickvals=list(range(len(display_data))),
+#             tickangle=-45,
+#             showline=True,
+#             linewidth=1,
+#             linecolor='#CCCCCC'
+#         ),
+#         yaxis=dict(
+#             showgrid=True,
+#             gridcolor='#E5E5E5',
+#             showline=True,
+#             linewidth=1,
+#             linecolor='#CCCCCC',
+#             tickprefix='$',
+#             tickformat='.2f'
+#         )
+#     )
+#     return fig
 
 def generate_analysis(ticker_data, symbol, breakout_type):
     current_row = ticker_data.iloc[0]
