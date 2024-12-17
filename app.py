@@ -294,8 +294,14 @@ def get_stock_data(conn):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
+# Add this import at the top of your file, with the other imports
+from pathlib import Path
+
 def create_price_chart(ticker_data, symbol, breakout_type):
     display_data = ticker_data.head(21).sort_values('DATE', ascending=True)
+    
+    # Get the absolute path to the logo
+    assets_path = Path(__file__).parent / "assets" / "Alta_light.png"
     
     fig = go.Figure()
     fig.add_trace(go.Scatter(
@@ -310,19 +316,19 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         showlegend=False
     ))
 
-    # Add logo as background image
+    # Add logo as background image with corrected path
     fig.add_layout_image(
         dict(
-            source="assets/Alta_light.png",
+            source=str(assets_path),
             xref="paper",
             yref="paper",
             x=0.5,
             y=0.5,
-            sizex=0.6,  # Adjust size as needed
-            sizey=0.6,  # Adjust size as needed
+            sizex=0.6,
+            sizey=0.6,
             xanchor="center",
             yanchor="middle",
-            opacity=0.1,  # Adjust opacity as needed
+            opacity=0.1,
             layer="below"
         )
     )
