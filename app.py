@@ -99,16 +99,6 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         showlegend=False
     ))
 
-    # Add vertical line at the start of the last 21 trading days
-    fig.add_vline(
-        x=len(display_data) - 21,  # Position at start of last 21 days
-        line_dash="dash",
-        line_color="gray",
-        opacity=0.5,
-        annotation_text="Past Month",
-        annotation_position="top"
-    )
-
     # Add logo as background image if available
     if logo_base64:
         fig.add_layout_image(
@@ -185,6 +175,7 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         )
     )
     return fig
+    
 def generate_analysis(ticker_data, symbol, breakout_type):
     current_row = ticker_data.iloc[0]
     signal_count = 0
