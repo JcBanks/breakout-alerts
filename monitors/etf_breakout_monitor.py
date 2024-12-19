@@ -5,12 +5,6 @@ from datetime import datetime
 import snowflake.connector
 import base64
 
-# Page config
-st.set_page_config(
-    page_title="ETF Breakout Scanner",
-    page_icon="📈",
-    layout="wide"
-)
 
 # Custom CSS
 st.markdown("""
