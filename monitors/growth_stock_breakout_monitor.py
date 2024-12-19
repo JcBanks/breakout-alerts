@@ -4,12 +4,6 @@ import plotly.graph_objects as go
 from datetime import datetime
 import snowflake.connector
 
-# Page config
-st.set_page_config(
-    page_title="Growth Stock Upside Breakout Monitor",
-    page_icon="📈",
-    layout="wide"
-)
 
 def get_snowflake_connection():
     return snowflake.connector.connect(
