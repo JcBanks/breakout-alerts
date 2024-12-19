@@ -105,13 +105,13 @@ def generate_analysis(ticker_data, symbol):
     signal_count = ticker_data.head(21)['IS_ONE_MONTH_HIGH'].sum()
 
     price = current_row['ADJCLOSE']
-    market_cap = current_row['MARKETCAP']
+    market_cap = current_row['MARKETCAP'] / 1e9  # Convert to billions
     industry = current_row['INDUSTRY']
 
     suffix = "th" if 4 <= signal_count <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(signal_count % 10, "th")
 
-    return (f"**Upside Breakout Alert:** {symbol} just hit a new 1 month high of ${price:.2f}. "
-            f"{symbol} is a ${market_cap:.1f} billion market cap member of the {industry} industry group. "
+    return (f"**Upside Breakout Alert:** {symbol} just hit a new 1 month high of ${price:,.2f}. "
+            f"{symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group. "
             f"This marks the {signal_count}{suffix} upside breakout for {symbol} over the last 21 trading days.")
 
 def main():
