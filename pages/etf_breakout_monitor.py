@@ -11,8 +11,8 @@ st.set_page_config(
     page_icon="📈",
 )
 
-st.title("ETF Breakout Monitor")
-st.write("This is the ETF Breakout Monitor.")
+# st.title("ETF Breakout Monitor")
+# st.write("This is the ETF Breakout Monitor.")
 # Custom CSS
 st.markdown("""
     <style>
