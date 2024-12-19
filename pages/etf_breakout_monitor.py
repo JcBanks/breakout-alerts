@@ -67,8 +67,12 @@ def create_price_chart(ticker_data, symbol, breakout_type):
     )
     return fig
 
-# Main function for the ETF Breakout Monitor page
 def etf_breakout_monitor():
+    # Back to Home button at the top
+    if st.button("⬅️ Back to Home"):
+        st.session_state["page"] = "Home"
+        return
+
     st.title("ETF Breakout Scanner")
     st.write(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -111,5 +115,3 @@ def etf_breakout_monitor():
             st.info("No breakouts found in the scanned symbols.")
         conn.close()
 
-    if st.button("⬅️ Back to Home"):
-        st.session_state["page"] = "Home"
