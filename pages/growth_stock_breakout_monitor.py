@@ -12,9 +12,6 @@ st.set_page_config(
     page_icon="📈",
 )
 
-st.title("Growth Stock Upside Breakout Monitor")
-st.write("This is the Growth Stock Upside Breakout Monitor.")
-
 
 def get_snowflake_connection():
     return snowflake.connector.connect(
