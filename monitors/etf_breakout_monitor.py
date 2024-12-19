@@ -5,7 +5,14 @@ from datetime import datetime
 import snowflake.connector
 import base64
 
+st.set_page_config(
+    page_title="ETF Breakout Monitor",
+    layout="wide",
+    page_icon="📈",
+)
 
+st.title("ETF Breakout Monitor")
+st.write("This is the ETF Breakout Monitor.")
 # Custom CSS
 st.markdown("""
     <style>
