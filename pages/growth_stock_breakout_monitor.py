@@ -63,7 +63,8 @@ def get_growth_stock_data(conn):
             and qsh.FUNDAMENTAL_SCORE >= 60
             qualify qsh.DATE = last_value(qsh.DATE) over (order by qsh.DATE)
         ) qsh on qsh.SYMBOL = rsi.ticker
-    where insp500
+    where 1=1
+    -- AND insp500
     order by rsi.TICKER desc, rsi.date desc)
     qualify last_value(is_one_month_high) over (partition by ticker order by date) = true
     order by ticker, date desc;
