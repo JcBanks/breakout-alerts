@@ -43,19 +43,23 @@ def get_stock_data(conn):
     from (
     select rsi.*,
            d.DESCRIPTION,
-           ADJHIGH = MAX(ADJHIGH) over (
+           -- Check if current close is equal to max close over past month
+           ADJCLOSE = MAX(ADJCLOSE) over (
                partition by rsi.ticker
                order by date rows between 20 preceding and current row
            ) as is_one_month_high,
-           ADJHIGH = MAX(ADJHIGH) over (
+           -- Check if current close is equal to max close over past year
+           ADJCLOSE = MAX(ADJCLOSE) over (
                partition by rsi.ticker
                order by date rows between 251 preceding and current row
            ) as is_one_year_high,
-           ADJLOW = MIN(ADJLOW) over (
+           -- Check if current close is equal to min close over past month
+           ADJCLOSE = MIN(ADJCLOSE) over (
                partition by rsi.ticker
                order by date rows between 20 preceding and current row
            ) as is_one_month_low,
-           ADJLOW = MIN(ADJLOW) over (
+           -- Check if current close is equal to min close over past year
+           ADJCLOSE = MIN(ADJCLOSE) over (
                partition by rsi.ticker
                order by date rows between 251 preceding and current row
            ) as is_one_year_low
@@ -184,16 +188,16 @@ def generate_analysis(ticker_data, symbol, breakout_type):
     
     if breakout_type == 'high':
         signal_count = recent_data['IS_ONE_MONTH_HIGH'].sum()
-        price = current_row['ADJHIGH']
+        price = current_row['ADJCLOSE']  # Changed from ADJHIGH to ADJCLOSE
         timeframe = "high" if current_row['IS_ONE_YEAR_HIGH'] else "1 month high"
         alert_type = "Upside"
     else:
         signal_count = recent_data['IS_ONE_MONTH_LOW'].sum()
-        price = current_row['ADJLOW']
+        price = current_row['ADJCLOSE']  # Changed from ADJLOW to ADJCLOSE
         timeframe = "low" if current_row['IS_ONE_YEAR_LOW'] else "1 month low"
         alert_type = "Downside"
     
-    alert = f"""**{alert_type} Breakout Alert:** {current_row['SHORTNAME']} ({symbol}) just hit a new {timeframe} at ${price:.2f}.
+    alert = f"""**{alert_type} Breakout Alert:** {current_row['SHORTNAME']} ({symbol}) just closed at a new {timeframe} of ${price:.2f}.
 {current_row['DESCRIPTION']}
 This marks the {signal_count}{'st' if signal_count == 1 else 'nd' if signal_count == 2 else 'rd' if signal_count == 3 else 'th'} {alert_type.lower()} breakout signal for {symbol} over the last 21 trading days."""
     
