@@ -4,6 +4,17 @@ import plotly.graph_objects as go
 from datetime import datetime
 import snowflake.connector
 
+import streamlit as st
+
+st.set_page_config(
+    page_title="Growth Stock Upside Breakout Monitor",
+    layout="wide",
+    page_icon="📈",
+)
+
+st.title("Growth Stock Upside Breakout Monitor")
+st.write("This is the Growth Stock Upside Breakout Monitor.")
+
 
 def get_snowflake_connection():
     return snowflake.connector.connect(
