@@ -108,17 +108,23 @@ def generate_analysis(ticker_data, symbol):
     market_cap = current_row['MARKETCAP'] / 1e9  # Convert to billions
     industry = current_row['INDUSTRY']
 
+    # Properly format the ordinal suffix
     suffix = "th" if 4 <= signal_count <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(signal_count % 10, "th")
 
-    return (f"**Upside Breakout Alert:** {symbol} just hit a new 1 month high of ${price:,.2f}. "
-            f"{symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group. "
-            f"This marks the {signal_count}{suffix} upside breakout for {symbol} over the last 21 trading days.")
+    # Build the properly formatted message
+    alert = (f"**Upside Breakout Alert:** {symbol} just hit a new 1-month high of ${price:,.2f}. "
+             f"{symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group. "
+             f"This marks the {signal_count}{suffix} upside breakout for {symbol} over the last 21 trading days.")
+    return alert
+
 
 def main():
     st.title("Growth Stock Upside Breakout Monitor")
     st.write(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     if st.button("🔙 Back to Home"):
-        st.query_params(page="")
+        st.experimental_set_query_params()  # Clear all query parameters
+        st.experimental_rerun()  # Rerun the app, which navigates to the default page
+
 
 
     with st.spinner("Fetching breakout data..."):
