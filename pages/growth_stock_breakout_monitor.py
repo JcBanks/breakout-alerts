@@ -73,10 +73,16 @@ def get_growth_stock_data(conn):
         cur = conn.cursor()
         df = cur.execute(query).fetch_pandas_all()
         df['DATE'] = pd.to_datetime(df['DATE'])
+
+        # Ensure MARKETCAP is a float
+        if 'MARKETCAP' in df.columns:
+            df['MARKETCAP'] = pd.to_numeric(df['MARKETCAP'], errors='coerce')
+
         return df
     except Exception as e:
         st.error(f"Error fetching data: {str(e)}")
         return None
+
 
 def create_price_chart(ticker_data, symbol):
     display_data = ticker_data.head(252).sort_values('DATE', ascending=True)
