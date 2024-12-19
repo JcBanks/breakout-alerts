@@ -68,11 +68,10 @@ def create_price_chart(ticker_data, symbol, breakout_type):
     return fig
 
 def etf_breakout_monitor():
-    # Back to Home button at the top
-    if st.button("⬅️ Back to Home"):
-        st.session_state["page"] = "Home"
-        return
+    # Back to Home button at the very top
+    st.sidebar.button("⬅️ Back to Home", on_click=lambda: st.session_state.update({"page": "Home"}))
 
+    # Main content
     st.title("ETF Breakout Scanner")
     st.write(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -93,6 +92,7 @@ def etf_breakout_monitor():
             elif latest['IS_ONE_MONTH_LOW']:
                 breakouts['lows'].append({'symbol': ticker, 'data': ticker_data})
 
+        # Split into columns
         col1, col2 = st.columns(2)
 
         with col1:
@@ -114,4 +114,5 @@ def etf_breakout_monitor():
         if not (breakouts['highs'] or breakouts['lows']):
             st.info("No breakouts found in the scanned symbols.")
         conn.close()
+
 
