@@ -118,7 +118,7 @@ def main():
     st.title("Growth Stock Upside Breakout Monitor")
     st.write(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     if st.button("🔙 Back to Home"):
-        st.st.query_params(page="")
+        st.query_params(page="")
 
 
     with st.spinner("Fetching breakout data..."):
