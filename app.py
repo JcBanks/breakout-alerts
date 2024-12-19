@@ -197,15 +197,10 @@ def generate_analysis(ticker_data, symbol, breakout_type):
         timeframe = "low" if current_row['IS_ONE_YEAR_LOW'] else "1 month low"
         alert_type = "Downside"
     
-    # Escape any special characters in the shortname and description
-    shortname = current_row['SHORTNAME'].replace('_', '\\_')  # Escape underscores
-    description = current_row['DESCRIPTION'].replace('_', '\\_')  # Escape underscores
+    # Replace markdown special characters in description
+    safe_description = current_row['DESCRIPTION'].replace('_', '\\_').replace('*', '\\*')
     
-    alert = f"""**{alert_type} Breakout Alert:** {shortname} ({symbol}) just closed at a new {timeframe} of ${price:.2f}.
-
-{description}
-
-This marks the {signal_count}{'st' if signal_count == 1 else 'nd' if signal_count == 2 else 'rd' if signal_count == 3 else 'th'} {alert_type.lower()} breakout signal for {symbol} over the last 21 trading days."""
+    alert = f"""**{alert_type} Breakout Alert:** {current_row['SHORTNAME']} ({symbol}) just closed at a new {timeframe} of ${price:.2f}. {safe_description} This marks the {signal_count}{'st' if signal_count == 1 else 'nd' if signal_count == 2 else 'rd' if signal_count == 3 else 'th'} {alert_type.lower()} breakout signal for {symbol} over the last 21 trading days."""
     
     return alert
 
