@@ -188,19 +188,42 @@ def generate_analysis(ticker_data, symbol, breakout_type):
     
     if breakout_type == 'high':
         signal_count = recent_data['IS_ONE_MONTH_HIGH'].sum()
-        price = current_row['ADJCLOSE']  # Changed from ADJHIGH to ADJCLOSE
+        price = current_row['ADJCLOSE']
         timeframe = "high" if current_row['IS_ONE_YEAR_HIGH'] else "1 month high"
         alert_type = "Upside"
     else:
         signal_count = recent_data['IS_ONE_MONTH_LOW'].sum()
-        price = current_row['ADJCLOSE']  # Changed from ADJLOW to ADJCLOSE
+        price = current_row['ADJCLOSE']
         timeframe = "low" if current_row['IS_ONE_YEAR_LOW'] else "1 month low"
         alert_type = "Downside"
     
-    # Replace markdown special characters in description
-    safe_description = current_row['DESCRIPTION'].replace('_', '\\_').replace('*', '\\*')
+    # Clean up description by:
+    # 1. Replacing markdown special characters
+    # 2. Ensuring no vertical text formatting
+    # 3. Removing extra whitespace
+    description = (current_row['DESCRIPTION']
+                  .replace('_', '\\_')
+                  .replace('*', '\\*')
+                  .replace('\n', ' ')  # Replace newlines with spaces
+                  .strip())  # Remove leading/trailing whitespace
     
-    alert = f"""**{alert_type} Breakout Alert:** {current_row['SHORTNAME']} ({symbol}) just closed at a new {timeframe} of ${price:.2f}. {safe_description} This marks the {signal_count}{'st' if signal_count == 1 else 'nd' if signal_count == 2 else 'rd' if signal_count == 3 else 'th'} {alert_type.lower()} breakout signal for {symbol} over the last 21 trading days."""
+    # Format the ordinal suffix properly
+    if signal_count == 1:
+        suffix = 'st'
+    elif signal_count == 2:
+        suffix = 'nd'
+    elif signal_count == 3:
+        suffix = 'rd'
+    else:
+        suffix = 'th'
+    
+    # Build the alert message with proper formatting
+    alert = (
+        f"**{alert_type} Breakout Alert:** {current_row['SHORTNAME']} ({symbol}) "
+        f"just closed at a new {timeframe} of ${price:.2f}. {description} "
+        f"This marks the {signal_count}{suffix} {alert_type.lower()} breakout signal "
+        f"for {symbol} over the last 21 trading days."
+    )
     
     return alert
 
