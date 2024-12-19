@@ -122,8 +122,7 @@ def main():
     st.title("Growth Stock Upside Breakout Monitor")
     st.write(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     if st.button("🔙 Back to Home"):
-        st.experimental_set_query_params()  # Clear all query parameters
-        st.experimental_rerun()  # Rerun the app, which navigates to the default page
+        st.query_params["page"] = ""  # Update the query parameters
 
 
 
