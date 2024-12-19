@@ -325,13 +325,13 @@ import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 
 st.set_page_config(
-    page_title="Breakout Monitor Dashboard",
+    page_title="Project Blizzard Dashboard",
     layout="wide",
     page_icon="📊",
 )
 
 st.title("Breakout Monitor Dashboard")
-st.markdown("Welcome to the Breakout Monitor! Choose one of the monitors below:")
+st.markdown("Welcome to the Project Blizzard Dashboard! Choose one of the monitors below:")
 
 col1, col2 = st.columns(2)
 
