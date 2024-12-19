@@ -333,23 +333,17 @@ st.set_page_config(
 st.title("Breakout Monitor Dashboard")
 st.markdown("Welcome to the Breakout Monitor! Choose one of the monitors below:")
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 # ETF Breakout Monitor Tile
 with col1:
-    st.image("assets/icon_etf.png", width=100)
+    st.image("assets/Alta_light.png", width=100)
     if st.button("ETF Breakout Monitor"):
         switch_page("etf_breakout_monitor")
 
 # Growth Stock Monitor Tile
 with col2:
-    st.image("assets/icon_growth.png", width=100)
+    st.image("assets/Alta_light.png", width=100)
     if st.button("Growth Stock Monitor"):
         switch_page("growth_stock_breakout_monitor")
-
-# ETF Momentum Extremes Monitor Tile
-with col3:
-    st.image("assets/icon_momentum.png", width=100)
-    if st.button("ETF Momentum Monitor"):
-        switch_page("etf_momentum_extremes_monitor")
 
