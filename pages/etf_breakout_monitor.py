@@ -20,14 +20,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-def get_image_as_base64():
-    try:
-        with open("assets/Alta_light.png", "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode()
-    except Exception as e:
-        st.warning(f"Could not load logo: {str(e)}")
-        return None
-
 def get_snowflake_connection():
     return snowflake.connector.connect(
         user=st.secrets["SNOWFLAKE_USER"],
@@ -86,9 +78,6 @@ def create_price_chart(ticker_data, symbol, breakout_type):
     # Take 252 trading days (1 year) and sort by date
     display_data = ticker_data.head(252).sort_values('DATE', ascending=True)
     
-    # Get base64 encoded logo
-    logo_base64 = get_image_as_base64()
-    
     fig = go.Figure()
     
     # Main price line
@@ -103,24 +92,6 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         ),
         showlegend=False
     ))
-
-    # Add logo as background image if available
-    if logo_base64:
-        fig.add_layout_image(
-            dict(
-                source=f"data:image/png;base64,{logo_base64}",
-                xref="paper",
-                yref="paper",
-                x=0.5,
-                y=0.5,
-                sizex=0.6,
-                sizey=0.6,
-                xanchor="center",
-                yanchor="middle",
-                opacity=0.1,
-                layer="below"
-            )
-        )
 
     # Calculate tick positions for approximately monthly intervals
     tick_positions = list(range(0, len(display_data), 21))  # Show one tick per month
