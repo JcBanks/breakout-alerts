@@ -30,6 +30,14 @@ def get_snowflake_connection():
         schema='RESEARCHDATA',
     )
 
+def get_image_as_base64():
+    try:
+        with open("assets/ts.png", "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode()
+    except Exception as e:
+        st.warning(f"Could not load logo: {str(e)}")
+        return None
+
 def get_stock_data(conn):
     query = """
     select *
@@ -151,7 +159,106 @@ def create_price_chart(ticker_data, symbol, breakout_type):
         )
     )
     return fig
+
+def create_price_chart_ts(ticker_data, symbol, breakout_type):
+    # Take 252 trading days (1 year) and sort by date
+    display_data = ticker_data.head(252).sort_values('DATE', ascending=True)
+
+    # Get base64 encoded logo
+    logo_base64 = get_image_as_base64()
     
+    fig = go.Figure()
+    
+    # Main price line
+    fig.add_trace(go.Scatter(
+        x=list(range(len(display_data))),
+        y=display_data['ADJCLOSE'],
+        mode='lines',
+        name=symbol,
+        line=dict(
+            color='royalblue',
+            width=2
+        ),
+        showlegend=False
+    ))
+
+    # Add logo as background image if available
+    if logo_base64:
+        fig.add_layout_image(
+            dict(
+                source=f"data:image/png;base64,{logo_base64}",
+                xref="paper",
+                yref="paper",
+                x=0.5,
+                y=0.5,
+                sizex=0.6,
+                sizey=0.6,
+                xanchor="center",
+                yanchor="middle",
+                opacity=0.1,
+                layer="below"
+            )
+        )
+    
+    # Calculate tick positions for approximately monthly intervals
+    tick_positions = list(range(0, len(display_data), 21))  # Show one tick per month
+    tick_dates = [display_data.iloc[i]['DATE'] for i in tick_positions if i < len(display_data)]
+    tick_texts = [d.strftime('%b %Y') for d in tick_dates]
+
+    # Calculate y-axis range
+    y_min = display_data['ADJCLOSE'].min()
+    y_max = display_data['ADJCLOSE'].max()
+    y_range = y_max - y_min
+    # Add 5% padding
+    y_min -= y_range * 0.05
+    y_max += y_range * 0.05
+
+    fig.update_layout(
+        title={
+            'text': f"{symbol} - {'Upside' if breakout_type == 'high' else 'Downside'} Breakout",
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=16)
+        },
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+        width=1250,
+        height=400,
+        margin=dict(l=40, r=40, t=60, b=40),
+        xaxis=dict(
+            showgrid=True,
+            gridcolor='#E5E5E5',
+            gridwidth=0.5,
+            griddash='dot',
+            dtick=21,
+            tickmode='array',
+            ticktext=tick_texts,
+            tickvals=tick_positions,
+            tickangle=-45,
+            showline=True,
+            linewidth=1,
+            linecolor='#CCCCCC',
+            zeroline=False
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor='#E5E5E5',
+            gridwidth=0.5,
+            griddash='dot',
+            nticks=8,  # Limit number of ticks
+            range=[y_min, y_max],  # Set range with padding
+            showline=True,
+            linewidth=1,
+            linecolor='#CCCCCC',
+            tickprefix='$',
+            tickformat='.2f',
+            zeroline=False
+        )
+    )
+    return fig
+
 def generate_analysis(ticker_data, symbol, breakout_type):
     current_row = ticker_data.iloc[0]
     signal_count = 0
@@ -244,6 +351,10 @@ def main():
                     ))
                     st.plotly_chart(
                         create_price_chart(breakout['data'], breakout['symbol'], 'high'),
+                        use_container_width=True
+                    )
+                    st.plotly_chart(
+                        create_price_chart_ts(breakout['data'], breakout['symbol'], 'high'),
                         use_container_width=True
                     )
                     st.divider()
