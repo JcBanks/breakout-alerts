@@ -40,13 +40,13 @@ def get_growth_stock_data(conn, symbol: str):
         return None
 
 def create_price_chart(ticker_data, symbol):
-    display_data = ticker_data.head(252).sort_values('DATE', ascending=True)
+    display_data = ticker_data.head(252).sort_values('Date', ascending=True)
 
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
-        x=display_data['DATE'],
-        y=display_data['ADJCLOSE'],
+        x=display_data['Date'],
+        y=display_data['Close'],
         mode='lines',
         name=symbol,
         line=dict(color='royalblue', width=2)
@@ -76,6 +76,6 @@ with st.form("stock_form"):
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
                     st.success(f"Showing price history for {symbol.upper()}:")
-                    #st.plotly_chart(create_price_chart(data, symbol.upper()), use_container_width=True)
+                    st.plotly_chart(create_price_chart(data, symbol.upper()), use_container_width=True)
                     st.dataframe(data)
                 conn.close()
