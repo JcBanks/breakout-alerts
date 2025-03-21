@@ -69,17 +69,11 @@ with st.form("stock_form"):
         symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
 
     with col2:
-        default_start, default_end = datetime.now() - timedelta(years=1), datetime.now()
-        refresh_value = timedelta(days=1)
-        refresh_buttons = [{
-                            'button_name': 'Refresh Last 1 Days',
-                            'refresh_value': refresh_value
-                          }]
-            
+        default_start, default_end = datetime.now() - relativedelta(years=1), datetime.now()
+
         date_range_string = date_range_picker(picker_type=PickerType.date,
                                               start=default_start, end=default_end,
-                                              key='date_range_picker',
-                                              refresh_buttons=refresh_buttons)
+                                              key='date_range_picker')
         if date_range_string:
             start, end = date_range_string
             st.write(f"Date Range Picker [{start}, {end}]")
