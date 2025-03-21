@@ -3,3 +3,4 @@ pandas
 plotly
 snowflake-connector-python
 streamlit-extras
+streamlit_datetime_range_picker
