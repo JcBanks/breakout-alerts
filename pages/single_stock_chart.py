@@ -84,7 +84,7 @@ with st.form("stock_form"):
                               key='date_picker')
     
     if date_string is not None:
-    st.write('Date Picker: ', date_string)
+        st.write('Date Picker: ', date_string)
     
     submitted = st.form_submit_button("Get Chart")
 
