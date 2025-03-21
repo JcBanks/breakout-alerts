@@ -119,9 +119,9 @@ def generate_analysis(ticker_data, symbol):
     suffix = "th" if 4 <= signal_count <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(signal_count % 10, "th")
 
     # Build the properly formatted message
-    st.write(f"Upside Breakout Alert: ${symbol} just hit a new 1-month high of ${price:,.2f}.")
-    st.write(f"${symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group.")
-    st.write(f"This marks the {signal_count}{suffix} upside breakout for ${symbol} over the last 21 trading days.")
+    st.write(f"Upside Breakout Alert: \${symbol} just hit a new 1-month high of \${price:,.2f}.")
+    st.write(f"\${symbol} is a \${market_cap:,.2f} billion market cap member of the {industry} industry group.")
+    st.write(f"This marks the {signal_count}{suffix} upside breakout for \${symbol} over the last 21 trading days.")
     
 
     # alert = (f"**Upside Breakout Alert:** ${symbol} just hit a new 1-month high of ${price:,.2f}. "
