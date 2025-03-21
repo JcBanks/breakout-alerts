@@ -23,16 +23,16 @@ def get_snowflake_connection():
     )
 
 def get_growth_stock_data(conn, symbol: str):
-    query = """
+    query = f"""
     SELECT TRADEDATE as "Date",TRADECLOSE as "Close"
     FROM TRADESMITH.HISTORICALDATANEW.STOCKDATA_SVIEW SD INNER JOIN TRADESMITH.HISTORICALDATANEW.SYMBOL_SVIEW S ON S.SymbolId = SD.SymbolId
-    WHERE S.Symbol = ?
+    WHERE S.Symbol = '{symbol.upper()}'
     ORDER BY TradeDate desc;
     """
 
     try:
         cur = conn.cursor()
-        df = cur.execute(query, params=(symbol.upper())).fetch_pandas_all()
+        df = cur.execute(query).fetch_pandas_all()
 
         return df
     except Exception as e:
