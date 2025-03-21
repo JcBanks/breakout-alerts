@@ -59,11 +59,12 @@ def create_price_chart(ticker_data, symbol, start, end):
         title=f"{symbol}",
         xaxis_title="Date",
         yaxis_title="Price",
+        xaxis_range=[start,end],
         height=400,
         width=800
     )
 
-    fig.update_layout(xaxis_range=[start,end])
+
 
     return fig
 
