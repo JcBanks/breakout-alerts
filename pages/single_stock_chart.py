@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
 import snowflake.connector
+from streamlit_datetime_range_picker import datetime_range_picker
+
 
 import streamlit as st
 
@@ -63,6 +65,27 @@ def create_price_chart(ticker_data, symbol):
 
 with st.form("stock_form"):
     symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
+    # Use date_range_picker to create a datetime range picker
+    st.subheader('Date Range Picker')
+    date_range_string = date_range_picker(picker_type=PickerType.time.string_value,
+                                          start=-30, end=0, unit=Unit.days.string_value,
+                                          key='range_picker',
+                                          refresh_button={'is_show': True, 'button_name': 'Reset',
+                                                          'refresh_date': -30,
+                                                          'unit': Unit.days.string_value})
+    if date_range_string is not None:
+        start_datetime = date_range_string[0]
+        end_datetime = date_range_string[1]
+        st.write(f"Date Range Picker [{start_datetime}, {end_datetime}]")
+    
+    st.subheader('Date Picker')
+    # Use date_picker to create a date picker
+    date_string = date_picker(picker_type=PickerType.time.string_value, value=0, unit=Unit.days.string_value,
+                              key='date_picker')
+    
+    if date_string is not None:
+    st.write('Date Picker: ', date_string)
+    
     submitted = st.form_submit_button("Get Chart")
 
     if submitted:
