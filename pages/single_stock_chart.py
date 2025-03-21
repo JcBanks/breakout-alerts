@@ -25,7 +25,7 @@ def get_snowflake_connection():
         schema='RESEARCHDATA',
     )
 
-def get_growth_stock_data(conn, symbol: str):
+def get_growth_stock_data(conn, symbol: str, start, end):
     query = f"""
     SELECT TRADEDATE as "Date",TRADECLOSE as "Close"
     FROM TRADESMITH.HISTORICALDATANEW.STOCKDATA_SVIEW SD INNER JOIN TRADESMITH.HISTORICALDATANEW.SYMBOL_SVIEW S ON S.SymbolId = SD.SymbolId
@@ -36,8 +36,12 @@ def get_growth_stock_data(conn, symbol: str):
     try:
         cur = conn.cursor()
         df = cur.execute(query).fetch_pandas_all()
+        df['Date'] = pd.to_datetime(df['Date'])
+        start = pd.to_datetime(start)
+        end = pd.to_datetime(end)
+        filtered_data = df[(df['Date'] >= start) & (df['Date'] <= end)]
 
-        return df
+        return filtered_data
     except Exception as e:
         st.error(f"Error fetching data: {str(e)}")
         return None
@@ -59,7 +63,6 @@ def create_price_chart(ticker_data, symbol, start, end):
         title=f"${symbol}",
         xaxis_title="Date",
         yaxis_title="Price",
-        xaxis_range=[start,end],
         height=400,
         width=800
     )
@@ -91,7 +94,7 @@ with st.form("stock_form"):
         else:
             with st.spinner("Fetching data..."):
                 conn = get_snowflake_connection()
-                data = get_growth_stock_data(conn,symbol)
+                data = get_growth_stock_data(conn,symbol,start,end)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
