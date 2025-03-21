@@ -49,10 +49,12 @@ with st.form("stock_form"):
             st.warning("Please enter a valid stock symbol.")
         else:
             with st.spinner("Fetching data..."):
-                data = get_growth_stock_data(symbol)
+                conn = get_snowflake_connection()
+                data = get_growth_stock_data(conn,symbol)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
                     st.success(f"Showing price history for {symbol.upper()}:")
                     data['date'] = pd.to_datetime(data['date'])
                     st.line_chart(data.set_index("date")["price"])
+                conn.close()
