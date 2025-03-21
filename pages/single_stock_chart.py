@@ -54,8 +54,7 @@ def create_price_chart(ticker_data, symbol, start, end):
         name=symbol,
         line=dict(color='royalblue', width=2)
     ))
-fig.update_layout(xaxis_range=['2016-07-01','2016-12-31'],
-                  title_text="Manually Set Date Range")
+
     fig.update_layout(
         title=f"${symbol}",
         xaxis_title="Date",
