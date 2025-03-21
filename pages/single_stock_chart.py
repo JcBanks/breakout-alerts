@@ -73,7 +73,6 @@ with st.form("stock_form"):
         symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
 
     with col2:
-        st.write("Enter date range (default 1 year)")
         default_start, default_end = datetime.now() - relativedelta(years=1), datetime.now()
 
         date_range_string = date_range_picker(picker_type=PickerType.date,
@@ -81,10 +80,8 @@ with st.form("stock_form"):
                                               key='date_range_picker')
         if date_range_string:
             start, end = date_range_string
-            st.write(f"Date Range Picker [{start}, {end}]")
     
     with col3:
-        st.write("Submit")
         submitted = st.form_submit_button("Get Chart")
 
     if submitted:
