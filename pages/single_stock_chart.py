@@ -73,7 +73,7 @@ with st.form("stock_form"):
         symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
 
     with col2:
-        st.text_input("Enter date range (default 1 year)")
+        st.write("Enter date range (default 1 year)")
         default_start, default_end = datetime.now() - relativedelta(years=1), datetime.now()
 
         date_range_string = date_range_picker(picker_type=PickerType.date,
@@ -84,7 +84,7 @@ with st.form("stock_form"):
             st.write(f"Date Range Picker [{start}, {end}]")
     
     with col3:
-        st.text_input("Submit")
+        st.write("Submit")
         submitted = st.form_submit_button("Get Chart")
 
     if submitted:
@@ -93,11 +93,11 @@ with st.form("stock_form"):
         else:
             with st.spinner("Fetching data..."):
                 conn = get_snowflake_connection()
-                data = get_growth_stock_data(conn,symbol, start, end)
+                data = get_growth_stock_data(conn,symbol)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
                     st.success(f"Showing price history for {symbol.upper()}:")
-                    st.plotly_chart(create_price_chart(data, symbol.upper()), use_container_width=True)
+                    st.plotly_chart(create_price_chart(data, symbol.upper()), use_container_width=True, start, end)
                     st.dataframe(data)
                 conn.close()
