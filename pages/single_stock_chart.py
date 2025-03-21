@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
 import snowflake.connector
-from streamlit_datetime_range_picker import datetime_range_picker
+from streamlit_date_picker import date_range_picker, date_picker, PickerType
 
 
 import streamlit as st
@@ -65,26 +65,20 @@ def create_price_chart(ticker_data, symbol):
 
 with st.form("stock_form"):
     symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
-    # Use date_range_picker to create a datetime range picker
-    st.subheader('Date Range Picker')
-    date_range_string = date_range_picker(picker_type=PickerType.time.string_value,
-                                          start=-30, end=0, unit=Unit.days.string_value,
-                                          key='range_picker',
-                                          refresh_button={'is_show': True, 'button_name': 'Reset',
-                                                          'refresh_date': -30,
-                                                          'unit': Unit.days.string_value})
-    if date_range_string is not None:
-        start_datetime = date_range_string[0]
-        end_datetime = date_range_string[1]
-        st.write(f"Date Range Picker [{start_datetime}, {end_datetime}]")
     
-    st.subheader('Date Picker')
-    # Use date_picker to create a date picker
-    date_string = date_picker(picker_type=PickerType.time.string_value, value=0, unit=Unit.days.string_value,
-                              key='date_picker')
-    
-    if date_string is not None:
-        st.write('Date Picker: ', date_string)
+    default_start, default_end = datetime.now() - timedelta(days=30), datetime.now()
+    refresh_value = timedelta(days=30)
+    refresh_buttons = [{
+                        'button_name': 'Refresh Last 1 Month',
+                        'refresh_value': refresh_value
+                      }]
+    date_range_string = date_range_picker(picker_type=PickerType.month,
+                                          start=default_start, end=default_end,
+                                          key='month_range_picker',
+                                          refresh_buttons=refresh_buttons)
+    if date_range_string:
+        start, end = date_range_string
+        st.write(f"Month Range Picker [{start}, {end}]")
     
     submitted = st.form_submit_button("Get Chart")
 
