@@ -59,7 +59,7 @@ def create_price_chart(ticker_data, symbol, start, end):
         title=f"{symbol}",
         xaxis_title="Date",
         yaxis_title="Price",
-        xaxis_range=[start,end],
+        xaxis=dict(range=[start,end]),
         height=400,
         width=800
     )
@@ -95,7 +95,7 @@ with st.form("stock_form"):
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
-                    st.success(f"Showing price history for {symbol.upper()}:")
+                    st.success(f"Showing price history for {symbol.upper()} {start} {end}:")
                     st.plotly_chart(create_price_chart(data, symbol.upper(), start, end), use_container_width=True)
                     st.dataframe(data)
                 conn.close()
