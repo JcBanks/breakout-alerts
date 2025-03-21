@@ -1,4 +1,4 @@
-import streamlit as st
+Fimport streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
@@ -53,7 +53,7 @@ def create_price_chart(ticker_data, symbol):
     ))
 
     fig.update_layout(
-        title=f"{symbol} - Upside Breakout",
+        title=f"{symbol}",
         xaxis_title="Date",
         yaxis_title="Price",
         height=400,
