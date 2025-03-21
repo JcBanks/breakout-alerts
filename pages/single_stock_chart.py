@@ -32,7 +32,7 @@ def get_growth_stock_data(conn, symbol: str):
 
     try:
         cur = conn.cursor()
-        df = cur.execute(query, params=(symbol.upper()).fetch_pandas_all())
+        df = cur.execute(query, params=(symbol.upper())).fetch_pandas_all()
 
         return df
     except Exception as e:
@@ -50,6 +50,7 @@ with st.form("stock_form"):
         else:
             with st.spinner("Fetching data..."):
                 conn = get_snowflake_connection()
+                st.write(symbol)
                 data = get_growth_stock_data(conn,symbol)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
