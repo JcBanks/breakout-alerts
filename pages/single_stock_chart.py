@@ -42,9 +42,9 @@ def get_growth_stock_data(conn, symbol: str):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
-def create_price_chart(ticker_data, symbol):
+def create_price_chart(ticker_data, symbol, start, end):
     display_data = ticker_data.head(252).sort_values('Date', ascending=True)
-
+    
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(
@@ -62,6 +62,9 @@ def create_price_chart(ticker_data, symbol):
         height=400,
         width=800
     )
+
+    fig.update_layout(xaxis_range=[start,end])
+
     return fig
 
 with st.form("stock_form"):
@@ -70,6 +73,7 @@ with st.form("stock_form"):
         symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
 
     with col2:
+        st.text_input("Enter date range (default 1 year)")
         default_start, default_end = datetime.now() - relativedelta(years=1), datetime.now()
 
         date_range_string = date_range_picker(picker_type=PickerType.date,
@@ -80,6 +84,7 @@ with st.form("stock_form"):
             st.write(f"Date Range Picker [{start}, {end}]")
     
     with col3:
+        st.text_input("Submit")
         submitted = st.form_submit_button("Get Chart")
 
     if submitted:
@@ -88,7 +93,7 @@ with st.form("stock_form"):
         else:
             with st.spinner("Fetching data..."):
                 conn = get_snowflake_connection()
-                data = get_growth_stock_data(conn,symbol)
+                data = get_growth_stock_data(conn,symbol, start, end)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
