@@ -39,6 +39,27 @@ def get_growth_stock_data(conn, symbol: str):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
+def create_price_chart(ticker_data, symbol):
+    display_data = ticker_data.head(252).sort_values('DATE', ascending=True)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=display_data['DATE'],
+        y=display_data['ADJCLOSE'],
+        mode='lines',
+        name=symbol,
+        line=dict(color='royalblue', width=2)
+    ))
+
+    fig.update_layout(
+        title=f"{symbol} - Upside Breakout",
+        xaxis_title="Date",
+        yaxis_title="Price",
+        height=400,
+        width=800
+    )
+    return fig
 
 with st.form("stock_form"):
     symbol = st.text_input("Enter stock symbol (e.g., AAPL, TSLA):", max_chars=10)
@@ -50,12 +71,11 @@ with st.form("stock_form"):
         else:
             with st.spinner("Fetching data..."):
                 conn = get_snowflake_connection()
-                st.write(symbol)
                 data = get_growth_stock_data(conn,symbol)
                 if data.empty:
                     st.error(f"No data found for symbol '{symbol.upper()}'.")
                 else:
                     st.success(f"Showing price history for {symbol.upper()}:")
-                    data['date'] = pd.to_datetime(data['date'])
-                    st.line_chart(data.set_index("date")["price"])
+                    #st.plotly_chart(create_price_chart(data, symbol.upper()), use_container_width=True)
+                    st.dataframe(data)
                 conn.close()
