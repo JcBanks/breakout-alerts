@@ -29,7 +29,7 @@ def show_growth_stock_monitor():
     for ticker in df['TICKER'].unique():
         stock_data = df[df['TICKER'] == ticker].iloc[0]
 
-        st.subheader(f"{stock_data['COMPANY_NAME']} ({ticker})")
+        st.subheader("$"+ticker)
 
         col1, col2, col3 = st.columns(3)
 
