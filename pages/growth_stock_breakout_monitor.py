@@ -33,7 +33,10 @@ def get_growth_stock_data():
             ORDER BY
                 BREAKOUT_PERCENT DESC
         """
-        return conn.query(query)
+        cur = conn.cursor()
+        df = cur.execute(query).fetch_pandas_all()
+        df['DATE'] = pd.to_datetime(df['DATE'])
+        return df
 
 # Main Display Logic
 def show_growth_stock_monitor():
