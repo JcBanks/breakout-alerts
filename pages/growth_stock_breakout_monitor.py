@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from utils.database import get_snowflake_connection
 from utils.helpers import format_percentage, format_currency
 
