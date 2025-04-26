@@ -73,7 +73,8 @@ def show_growth_stock_monitor():
     st.title("Growth Stock Breakout Monitor")
     st.markdown("Explore today's top growth stock breakouts! 📈")
 
-    df = get_growth_stock_data()
+    #df = get_growth_stock_data()
+    df = pd.read_csv('growth.csv.zip')
 
     if df.empty:
         st.info("No breakout stocks found at the moment. 📉 Come back later!")
