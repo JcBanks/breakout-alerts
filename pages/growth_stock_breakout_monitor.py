@@ -18,20 +18,49 @@ if 'view' not in st.session_state:
 def get_growth_stock_data():
     with get_snowflake_connection() as conn:
         query = """
-            SELECT
-                TICKER,
-                COMPANY_NAME,
-                CLOSE_DATE,
-                CLOSE_PRICE,
-                BREAKOUT_LEVEL,
-                BREAKOUT_PERCENT,
-                BREAKOUT_VOLUME_PERCENT
-            FROM
-                BREAKOUT_ALERTS.GROWTH_STOCK_MONITOR
-            WHERE
-                CLOSE_DATE = CURRENT_DATE()
-            ORDER BY
-                BREAKOUT_PERCENT DESC
+        select *
+        from (
+        select rsi.*,
+               f.INDUSTRY,
+               f.MARKETCAP,
+               qsh.fundamental_score,
+               qsh.date quantum_score_date,
+               ADJCLOSE = MAX(ADJCLOSE) over (
+                   partition by rsi.ticker
+                   order by rsi.date rows between 20 preceding and current row
+               ) as is_one_month_high,
+               -- Check if current close is equal to max close over past year
+               ADJCLOSE = MAX(ADJCLOSE) over (
+                   partition by rsi.ticker
+                   order by rsi.date rows between 251 preceding and current row
+               ) as is_one_year_high,
+               -- Check if current close is equal to min close over past month
+               ADJCLOSE = MIN(ADJCLOSE) over (
+                   partition by rsi.ticker
+                   order by rsi.date rows between 20 preceding and current row
+               ) as is_one_month_low,
+               -- Check if current close is equal to min close over past year
+               ADJCLOSE = MIN(ADJCLOSE) over (
+                   partition by rsi.ticker
+                   order by rsi.date rows between 251 preceding and current row
+               ) as is_one_year_low
+        from RESEARCHDATA.YF_STOCK_RSI_DATA rsi
+            join FMP_DATA.FMP_STOCK_SCREENER f on f.SYMBOL = rsi.TICKER
+            join (
+                select s.SYMBOL,
+                       qsh.*
+                from RESEARCHDATA.QUANTUM_SCORE_HISTORY qsh
+                join HISTORICALDATANEW.SYMBOL_SVIEW s on qsh.SYMBOL_ID = s.SYMBOLID
+                where s.DELISTED = false
+                and case when ISDUPLICATE then 1 else 0 end = 0
+                and qsh.FUNDAMENTAL_SCORE >= 60
+                qualify qsh.DATE = last_value(qsh.DATE) over (order by qsh.DATE)
+            ) qsh on qsh.SYMBOL = rsi.ticker
+        where 1=1
+        -- AND insp500
+        order by rsi.TICKER desc, rsi.date desc)
+        qualify last_value(is_one_month_high) over (partition by ticker order by date) = true
+        order by ticker, date desc;
         """
         cur = conn.cursor()
         df = cur.execute(query).fetch_pandas_all()
