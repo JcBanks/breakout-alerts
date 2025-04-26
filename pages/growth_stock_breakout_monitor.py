@@ -13,9 +13,10 @@ st.set_page_config(
 if 'view' not in st.session_state:
     st.session_state.view = 'growth'
 
-# Database Query Function with Caching
-@st.cache_data(ttl=600)
+# Database Query Function 
+
 def get_growth_stock_data():
+    df = pd.DataFrame(data[])
     with get_snowflake_connection() as conn:
         query = """
         select *
@@ -65,7 +66,6 @@ def get_growth_stock_data():
         cur = conn.cursor()
         df = cur.execute(query).fetch_pandas_all()
         df['DATE'] = pd.to_datetime(df['DATE'])
-        return df
     return df
 
 # Main Display Logic
