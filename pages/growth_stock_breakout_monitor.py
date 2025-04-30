@@ -38,7 +38,13 @@ def show_growth_stock_monitor():
             ORDER BY
                 BREAKOUT_PERCENT DESC
         """
-    df = conn.query(query)
+        # Create cursor
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query)
+            df = cursor.fetch_pandas_all()
+        finally:
+            cursor.close()
 
 
     if df.empty:
