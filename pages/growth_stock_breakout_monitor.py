@@ -46,18 +46,14 @@ def show_growth_stock_monitor():
         finally:
             cursor.close()
 
-
     if df.empty:
         st.info("No breakout stocks found at the moment. 📉 Come back later!")
         return
 
     for ticker in df['TICKER'].unique():
         stock_data = df[df['TICKER'] == ticker].iloc[0]
-
         st.subheader("$"+ticker)
-
         col1, col2, col3 = st.columns(3)
-
         with col1:
             st.metric(label="Breakout Level", value=format_currency(stock_data['BREAKOUT_LEVEL']))
             st.metric(label="Breakout %", value=format_percentage(stock_data['BREAKOUT_PERCENT']))
