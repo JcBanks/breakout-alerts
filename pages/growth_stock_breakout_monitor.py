@@ -120,10 +120,10 @@ def generate_analysis(ticker_data, symbol):
 
     # Build the properly formatted message
     nl = '\n'
-    alert = (f"Upside Breakout Alert: {symbol} just hit a new 1-month high of ${price:,.2f}. "
-             f"{nl}{symbol} is a $${market_cap:,.2f} billion market cap member of the {industry} industry group. "
-             f"{nl}This marks the {signal_count}{suffix} upside breakout for {symbol} over the last 21 trading days.")
-    return alert
+    
+    st.write(f"Upside Breakout Alert: ${symbol} just hit a new 1-month high of ${price:,.2f}.")
+    st.write(f"${symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group.")
+    st.write(f"This marks the {signal_count}{suffix} upside breakout for ${symbol} over the last 21 trading days.")
 
 
 def main():
@@ -146,7 +146,7 @@ def main():
             ticker_data = df[df['TICKER'] == ticker]
 
             st.subheader("$"+ticker)
-            st.write(generate_analysis(ticker_data, "$"+ticker))
+            generate_analysis(ticker_data, "$"+ticker)
             st.plotly_chart(create_price_chart(ticker_data, ticker), use_container_width=True)
             st.divider()
 
