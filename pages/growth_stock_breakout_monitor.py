@@ -120,7 +120,7 @@ def generate_analysis(ticker_data, symbol):
 
     # Build the properly formatted message
     nl = '\n'
-    alert = (f"**Upside Breakout Alert:** {nl}${symbol} just hit a new 1-month high of ${price:,.2f}. "
+    alert = (f"Upside Breakout Alert: {nl}${symbol} just hit a new 1-month high of ${price:,.2f}. "
              f"{nl}${symbol} is a ${market_cap:,.2f} billion market cap member of the {industry} industry group. "
              f"{nl}This marks the {signal_count}{suffix} upside breakout for ${symbol} over the last 21 trading days.")
     return alert
