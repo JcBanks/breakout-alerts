@@ -14,20 +14,12 @@ st.set_page_config(
 if 'view' not in st.session_state:
     st.session_state.view = 'growth'
 
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 96f3b5b (wip)
 # Main Display Logic
 def show_growth_stock_monitor():
     st.title("Growth Stock Breakout Monitor")
     st.markdown("Explore today's top growth stock breakouts! 📈")
 
-<<<<<<< HEAD
-    url = "https://s3.us-east-1.amazonaws.com/220395743143.tools/growth.csv"
-    df = pd.read_csv(url)
-=======
     # Database Query Function with Caching
     with get_snowflake_connection() as conn:
         query = """
@@ -47,7 +39,7 @@ def show_growth_stock_monitor():
                 BREAKOUT_PERCENT DESC
         """
     df = conn.query(query)
->>>>>>> 96f3b5b (wip)
+
 
     if df.empty:
         st.info("No breakout stocks found at the moment. 📉 Come back later!")
