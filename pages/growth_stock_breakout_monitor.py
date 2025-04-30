@@ -23,20 +23,37 @@ def show_growth_stock_monitor():
     # Database Query Function with Caching
     with get_snowflake_connection() as conn:
         query = """
-            SELECT
-                TICKER,
-                COMPANY_NAME,
-                CLOSE_DATE,
-                CLOSE_PRICE,
-                BREAKOUT_LEVEL,
-                BREAKOUT_PERCENT,
-                BREAKOUT_VOLUME_PERCENT
-            FROM
-                BREAKOUT_ALERTS.GROWTH_STOCK_MONITOR
-            WHERE
-                CLOSE_DATE = CURRENT_DATE()
-            ORDER BY
-                BREAKOUT_PERCENT DESC
+            select *
+        from (
+        select rsi.*,
+            d.DESCRIPTION,
+            -- Check if current close is equal to max close over past month
+            ADJCLOSE = MAX(ADJCLOSE) over (
+                partition by rsi.ticker
+                order by date rows between 20 preceding and current row
+            ) as is_one_month_high,
+            -- Check if current close is equal to max close over past year
+            ADJCLOSE = MAX(ADJCLOSE) over (
+                partition by rsi.ticker
+                order by date rows between 251 preceding and current row
+            ) as is_one_year_high,
+            -- Check if current close is equal to min close over past month
+            ADJCLOSE = MIN(ADJCLOSE) over (
+                partition by rsi.ticker
+                order by date rows between 20 preceding and current row
+            ) as is_one_month_low,
+            -- Check if current close is equal to min close over past year
+            ADJCLOSE = MIN(ADJCLOSE) over (
+                partition by rsi.ticker
+                order by date rows between 251 preceding and current row
+            ) as is_one_year_low
+        from RESEARCHDATA.YF_STOCK_RSI_DATA rsi
+        JOIN RESEARCHDATA.ETF_DESCRIPTIONS d on d.TICKER = rsi.TICKER
+        where ISETF
+        order by rsi.TICKER desc, date desc)
+        qualify last_value(is_one_month_high) over (partition by ticker order by date) = true 
+            or last_value(is_one_month_low) over (partition by ticker order by date) = true
+        order by ticker desc, date desc;
         """
         # Create cursor
         cursor = conn.cursor()
